@@ -34,23 +34,22 @@ bun x convex dev
 bun run dev
 ```
 
-Convex generates `convex/_generated/` during `bun x convex dev`. Commit generated files when your development workflow requires repository typechecking without a live codegen step.
+`convex/_generated/` contains a small runtime compatibility layer so the repository can typecheck without a remote Convex deployment. A normal authenticated `bun x convex dev`/`bun x convex deploy` may regenerate the directory with schema-specific bindings for stronger editor-level API typing.
 
 ## Validation
 
 ```bash
 bun install --frozen-lockfile
-bun x convex codegen
 bun run typecheck
 bun run lint
 bun test
 bun run build
 ```
 
-GitHub Actions runs the same validation sequence after dependency installation.
+GitHub Actions runs the same validation sequence without requiring access to a production Convex deployment.
 
 ## Deployment
 
-For production Convex deployment, configure `CONVEX_DEPLOY_KEY` and the Clerk issuer domain in the production Convex environment, then run `bun x convex deploy`. Vercel should receive `NEXT_PUBLIC_CONVEX_URL` and `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` as production environment variables.
+For production Convex deployment, configure `CONVEX_DEPLOY_KEY`, `CLERK_JWT_ISSUER_DOMAIN`, and the provider secrets in the production environment, then run `bun x convex deploy`. Vercel is configured to deploy Convex and build Next.js atomically; it requires the production Convex deploy key and frontend environment variables.
 
 The application is not a regulated bank by itself. Real-money operation requires the appropriate licensed banking/payment partners, KYC/AML provider, fraud controls, operational approvals and compliance review. The software intentionally refuses to claim those external services are active when their credentials/configuration are absent.
