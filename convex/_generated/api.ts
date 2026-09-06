@@ -1,4 +1,4 @@
-import { anyApi, FunctionReference } from "convex/server";
+import { anyApi, type FunctionReference } from "convex/server";
 
 type User = { _id: string; name: string; email: string; role: string; kycStatus: string; accountStatus: string; createdAt: number };
 type Account = { _id: string; type: string; balance: number; availableBalance: number; currency: string; accountNumberMasked: string; status: string };
@@ -9,8 +9,8 @@ type Notification = { _id: string; title: string; body: string; read: boolean; t
 type KycCase = { _id: string; userId: string; status: string; requiredFields: string[]; reviewerNote?: string };
 type Dashboard = { user: User; accounts: Account[]; transactions: Transaction[]; cards: Card[]; transfers: Transfer[]; notifications: Notification[] };
 type Overview = { pendingKyc: KycCase[]; reviewTransfers: Transfer[]; failedTransfers: Transfer[] };
-
-type Ref<T extends "query" | "mutation", A, R> = FunctionReference<T, "public", A, R>;
+type Args = Record<string, unknown>;
+type Ref<T extends "query" | "mutation", A extends Args, R> = FunctionReference<T, "public", A, R>;
 
 export const api = {
   users: { provision: anyApi.users.provision as Ref<"mutation", { name?: string; email?: string }, User | null> },
