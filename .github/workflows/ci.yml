@@ -10,14 +10,24 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: 1.4.2
       - name: Install dependencies
         run: bun install
+      - name: Persist generated lockfile when bootstrapping repository
+        if: github.event_name == 'push'
+        run: |
+          if [ -f bun.lock ] && ! git ls-files --error-unmatch bun.lock >/dev/null 2>&1; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add bun.lock
+            git commit -m "chore: add Bun lockfile [skip ci]"
+            git push
+          fi
       - name: Verify frozen install
         run: bun install --frozen-lockfile
       - name: Typecheck
