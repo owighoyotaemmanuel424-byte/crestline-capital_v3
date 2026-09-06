@@ -20,10 +20,14 @@ jobs:
         run: bun install
       - name: Verify frozen install
         run: bun install --frozen-lockfile
-      - name: Generate Convex types
+      - name: Create local Convex deployment for CI
         env:
           CLERK_JWT_ISSUER_DOMAIN: https://ci.invalid.example
-        run: bun x convex codegen
+        run: bun x convex deployment create local --select
+      - name: Generate and validate Convex backend
+        env:
+          CLERK_JWT_ISSUER_DOMAIN: https://ci.invalid.example
+        run: bun x convex dev --once
       - name: Typecheck
         run: bun run typecheck
       - name: Lint
