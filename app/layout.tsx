@@ -1,6 +1,9 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import ConvexClientProvider from "@/components/ConvexClientProvider";
 
-export const metadata: Metadata = { title: "Crestline Capital", description: "Digital banking experience powered by Convex." };
+export const metadata: Metadata = { title: "Crestline Capital", description: "Digital banking platform powered by Convex." };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) { return <html lang="en"><body>{children}</body></html>; }
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return <html lang="en"><body><ConvexClientProvider>{children}</ConvexClientProvider></body></html>;
+}
