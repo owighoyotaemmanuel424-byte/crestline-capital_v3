@@ -1,0 +1,30 @@
+import { mutation, query } from "./_generated/server";
+import { v } from "convex/values";
+import { currentUser, requireRole, requireIdentity, writeAudit } from "./lib/auth";
+
+export const provision = mutation({
+  args: { name: v.optional(v.string()), email: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    const identity = await requireIdentity(ctx);
+    const existing = await ctx.db.query("users").withIndex("by_auth_subject", q => q.eq("authSubject", identity.subject)).unique();
+    if (existing) return existing;
+    const email = args.email ?? identity.email;
+    if (!email) throw new Error("EMAIL_REQUIRED");
+    const now = Date.now();
+    const userId = await ctx.db.insert("users", { authSubject: identity.subject, email, name: args.name ?? identity.name ?? email.split("@")[0], role: "customer", kycStatus: "not_started", accountStatus: "active", twoFactorEnabled: false, createdAt: now, updatedAt: now });
+    await writeAudit(ctx, userId, identity.subject, "user.provisioned", "user", userId, { email });
+    return await ctx.db.get(userId);
+  },
+});
+
+export const me = query({ args: {}, handler: async ctx => (await currentUser(ctx)).user });
+
+export const listForOperations = query({
+  args: { search: v.optional(v.string()), role: v.optional(v.union(v.literal("customer"), v.literal("support"), v.literal("operator"), v.literal("compliance"), v.literal("admin"))) },
+  handler: async (ctx, args) => {
+    await requireRole(ctx, ["support", "operator", "compliance", "admin"]);
+    const users = args.role ? await ctx.db.query("users").withIndex("by_role", q => q.eq("role", args.role!)).collect() : await ctx.db.query("users").collect();
+    const term = args.search?.trim().toLowerCase();
+    return users.filter(u => !term || u.email.toLowerCase().includes(term) || u.name.toLowerCase().includes(term)).map(u => ({ _id: u._id, name: u.name, email: u.email, role: u.role, kycStatus: u.kycStatus, accountStatus: u.accountStatus, createdAt: u.createdAt }));
+  },
+});
