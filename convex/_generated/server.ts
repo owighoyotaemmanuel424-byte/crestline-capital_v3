@@ -1,7 +1,7 @@
-// Compatibility layer for environments where Convex code generation is unavailable.
-// Production deployments may regenerate this directory; the runtime uses Convex's generic builders.
+// Codegen-independent bindings using the repository schema. Convex may regenerate this directory during deployment.
 import type { GenericQueryCtx, GenericMutationCtx } from "convex/server";
+import type { DataModel } from "./dataModel";
 export { queryGeneric as query, mutationGeneric as mutation } from "convex/server";
-export type QueryCtx = GenericQueryCtx<any>;
-export type MutationCtx = GenericMutationCtx<any>;
+export type QueryCtx = GenericQueryCtx<DataModel>;
+export type MutationCtx = GenericMutationCtx<DataModel>;
 export type { GenericId as Id } from "convex/values";
