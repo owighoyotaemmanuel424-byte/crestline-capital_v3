@@ -6,54 +6,19 @@ const accountStatus = v.union(v.literal("active"), v.literal("frozen"), v.litera
 const transferStatus = v.union(v.literal("initiated"), v.literal("review"), v.literal("processing"), v.literal("completed"), v.literal("failed"), v.literal("cancelled"));
 
 export default defineSchema({
-  users: defineTable({
-    authSubject: v.string(), email: v.string(), name: v.string(), role,
-    kycStatus: v.union(v.literal("not_started"), v.literal("pending"), v.literal("manual_review"), v.literal("verified"), v.literal("rejected")),
-    accountStatus: v.union(v.literal("active"), v.literal("restricted"), v.literal("closed")),
-    twoFactorEnabled: v.boolean(), createdAt: v.number(), updatedAt: v.number(),
-  }).index("by_auth_subject", ["authSubject"]).index("by_email", ["email"]).index("by_role", ["role"]),
-
-  accounts: defineTable({
-    userId: v.id("users"), type: v.union(v.literal("checking"), v.literal("savings"), v.literal("business")),
-    balance: v.number(), availableBalance: v.number(), currency: v.string(), accountNumber: v.string(), accountNumberMasked: v.string(),
-    status: accountStatus, createdAt: v.number(), updatedAt: v.number(),
-  }).index("by_user", ["userId"]).index("by_number", ["accountNumber"]).index("by_status", ["status"]),
-
-  transactions: defineTable({
-    accountId: v.id("accounts"), userId: v.id("users"), amount: v.number(), currency: v.string(),
-    category: v.string(), type: v.union(v.literal("debit"), v.literal("credit")),
-    status: v.union(v.literal("pending"), v.literal("completed"), v.literal("failed"), v.literal("reversed")),
-    description: v.string(), reference: v.string(), createdAt: v.number(), updatedAt: v.number(),
-  }).index("by_account", ["accountId", "createdAt"]).index("by_user", ["userId", "createdAt"]).index("by_reference", ["reference"]),
-
-  ledgerEntries: defineTable({
-    transactionId: v.id("transactions"), accountId: v.id("accounts"), direction: v.union(v.literal("debit"), v.literal("credit")),
-    amount: v.number(), currency: v.string(), createdAt: v.number(),
-  }).index("by_transaction", ["transactionId"]).index("by_account", ["accountId", "createdAt"]),
-
-  transfers: defineTable({
-    userId: v.id("users"), sourceAccountId: v.id("accounts"), destinationAccountId: v.optional(v.id("accounts")),
-    beneficiaryName: v.string(), beneficiaryAccount: v.string(), amount: v.number(), currency: v.string(),
-    status: transferStatus, riskScore: v.number(), riskDecision: v.union(v.literal("allow"), v.literal("review"), v.literal("deny")),
-    riskReasons: v.array(v.string()), reference: v.string(), idempotencyKey: v.string(),
-    failureCode: v.optional(v.string()), failureMessage: v.optional(v.string()), createdAt: v.number(), updatedAt: v.number(),
-  }).index("by_user", ["userId", "createdAt"]).index("by_idempotency", ["userId", "idempotencyKey"]).index("by_reference", ["reference"]).index("by_status", ["status", "createdAt"]),
-
+  users: defineTable({ authSubject: v.string(), email: v.string(), name: v.string(), role, kycStatus: v.union(v.literal("not_started"), v.literal("pending"), v.literal("manual_review"), v.literal("verified"), v.literal("rejected")), accountStatus: v.union(v.literal("active"), v.literal("restricted"), v.literal("closed")), twoFactorEnabled: v.boolean(), createdAt: v.number(), updatedAt: v.number() }).index("by_auth_subject", ["authSubject"]).index("by_email", ["email"]).index("by_role", ["role"]),
+  accounts: defineTable({ userId: v.id("users"), type: v.union(v.literal("checking"), v.literal("savings"), v.literal("business")), balance: v.number(), availableBalance: v.number(), currency: v.string(), accountNumber: v.string(), accountNumberMasked: v.string(), status: accountStatus, createdAt: v.number(), updatedAt: v.number() }).index("by_user", ["userId"]).index("by_number", ["accountNumber"]).index("by_status", ["status"]),
+  transactions: defineTable({ accountId: v.id("accounts"), userId: v.id("users"), amount: v.number(), currency: v.string(), category: v.string(), type: v.union(v.literal("debit"), v.literal("credit")), status: v.union(v.literal("pending"), v.literal("completed"), v.literal("failed"), v.literal("reversed")), description: v.string(), reference: v.string(), createdAt: v.number(), updatedAt: v.number() }).index("by_account", ["accountId", "createdAt"]).index("by_user", ["userId", "createdAt"]).index("by_reference", ["reference"]),
+  ledgerEntries: defineTable({ transactionId: v.id("transactions"), accountId: v.id("accounts"), direction: v.union(v.literal("debit"), v.literal("credit")), amount: v.number(), currency: v.string(), createdAt: v.number() }).index("by_transaction", ["transactionId"]).index("by_account", ["accountId", "createdAt"]),
+  transfers: defineTable({ userId: v.id("users"), sourceAccountId: v.id("accounts"), destinationAccountId: v.optional(v.id("accounts")), beneficiaryName: v.string(), beneficiaryAccount: v.string(), amount: v.number(), currency: v.string(), status: transferStatus, riskScore: v.number(), riskDecision: v.union(v.literal("allow"), v.literal("review"), v.literal("deny")), riskReasons: v.array(v.string()), reference: v.string(), idempotencyKey: v.string(), failureCode: v.optional(v.string()), failureMessage: v.optional(v.string()), createdAt: v.number(), updatedAt: v.number() }).index("by_user", ["userId", "createdAt"]).index("by_idempotency", ["userId", "idempotencyKey"]).index("by_reference", ["reference"]).index("by_status", ["status", "createdAt"]),
   beneficiaries: defineTable({ userId: v.id("users"), name: v.string(), accountNumber: v.string(), bankName: v.string(), active: v.boolean(), createdAt: v.number() }).index("by_user", ["userId"]).index("by_account", ["accountNumber"]),
-
   cards: defineTable({ accountId: v.id("accounts"), userId: v.id("users"), last4: v.string(), brand: v.string(), isFrozen: v.boolean(), expiryMonth: v.number(), expiryYear: v.number(), createdAt: v.number(), updatedAt: v.number() }).index("by_user", ["userId"]).index("by_account", ["accountId"]),
-
-  kycCases: defineTable({
-    userId: v.id("users"), provider: v.string(), providerReference: v.optional(v.string()), status: v.union(v.literal("not_started"), v.literal("submitted"), v.literal("pending"), v.literal("manual_review"), v.literal("verified"), v.literal("rejected"), v.literal("error")),
-    requiredFields: v.array(v.string()), failureCode: v.optional(v.string()), failureMessage: v.optional(v.string()), reviewerId: v.optional(v.id("users")), reviewerNote: v.optional(v.string()), createdAt: v.number(), updatedAt: v.number(),
-  }).index("by_user", ["userId", "createdAt"]).index("by_status", ["status", "createdAt"]),
-
+  kycCases: defineTable({ userId: v.id("users"), provider: v.string(), providerReference: v.optional(v.string()), status: v.union(v.literal("not_started"), v.literal("submitted"), v.literal("pending"), v.literal("manual_review"), v.literal("verified"), v.literal("rejected"), v.literal("error")), requiredFields: v.array(v.string()), failureCode: v.optional(v.string()), failureMessage: v.optional(v.string()), reviewerId: v.optional(v.id("users")), reviewerNote: v.optional(v.string()), createdAt: v.number(), updatedAt: v.number() }).index("by_user", ["userId", "createdAt"]).index("by_status", ["status", "createdAt"]),
   fraudRules: defineTable({ name: v.string(), enabled: v.boolean(), threshold: v.number(), action: v.union(v.literal("allow"), v.literal("review"), v.literal("deny")), description: v.string(), updatedAt: v.number(), updatedBy: v.id("users") }).index("by_enabled", ["enabled"]),
   fraudEvents: defineTable({ userId: v.id("users"), transferId: v.optional(v.id("transfers")), score: v.number(), decision: v.union(v.literal("allow"), v.literal("review"), v.literal("deny")), reasons: v.array(v.string()), signals: v.any(), createdAt: v.number() }).index("by_user", ["userId", "createdAt"]).index("by_transfer", ["transferId"]),
-
   notifications: defineTable({ userId: v.id("users"), type: v.union(v.literal("transaction"), v.literal("security"), v.literal("account"), v.literal("compliance")), title: v.string(), body: v.string(), dedupeKey: v.string(), read: v.boolean(), createdAt: v.number() }).index("by_user", ["userId", "createdAt"]).index("by_dedupe", ["userId", "dedupeKey"]),
   notificationDeliveries: defineTable({ notificationId: v.id("notifications"), channel: v.union(v.literal("in_app"), v.literal("email"), v.literal("sms")), status: v.union(v.literal("queued"), v.literal("sent"), v.literal("failed")), provider: v.string(), attempts: v.number(), lastError: v.optional(v.string()), updatedAt: v.number() }).index("by_notification", ["notificationId"]),
-
   auditLogs: defineTable({ actorUserId: v.optional(v.id("users")), actorSubject: v.string(), action: v.string(), targetType: v.string(), targetId: v.optional(v.string()), metadata: v.any(), createdAt: v.number() }).index("by_actor", ["actorUserId", "createdAt"]).index("by_target", ["targetType", "targetId", "createdAt"]).index("by_action", ["action", "createdAt"]),
   idempotencyKeys: defineTable({ userId: v.id("users"), key: v.string(), operation: v.string(), status: v.union(v.literal("started"), v.literal("completed"), v.literal("failed")), response: v.optional(v.any()), createdAt: v.number(), updatedAt: v.number() }).index("by_user_key", ["userId", "key"]),
+  rateLimits: defineTable({ userId: v.id("users"), action: v.string(), windowStart: v.number(), count: v.number() }).index("by_user_action", ["userId", "action"]),
 });
