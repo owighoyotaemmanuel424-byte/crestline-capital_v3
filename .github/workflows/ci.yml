@@ -8,8 +8,9 @@ on:
     branches: [main]
 
 env:
-  # CI builds must have a syntactically valid client URL. Production deployments must override this with the real Convex deployment URL.
+  # CI-only placeholders. Production deployments must provide real Convex/Clerk configuration.
   NEXT_PUBLIC_CONVEX_URL: https://ci-placeholder.convex.cloud
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ZXhhbXBsZS5hY2NvdW50cy5kZXYk
 
 jobs:
   validate:
