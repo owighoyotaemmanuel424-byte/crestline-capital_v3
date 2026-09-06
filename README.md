@@ -1,6 +1,6 @@
 # Crestline Capital v3
 
-Crestline Capital is a modern digital-banking application scaffold built with Next.js and Convex. The UI follows the supplied Bnk documentation: midnight/slate surfaces, electric-blue accents, responsive navigation, dashboard cards, accounts, transactions, card controls and security surfaces. fileciteturn0file0L5-L20
+Crestline Capital is a modern digital-banking application scaffold built with Next.js and Convex. The UI follows the supplied Bnk documentation: midnight/slate surfaces, electric-blue accents, responsive navigation, dashboard cards, accounts, transactions, card controls and security surfaces.
 
 ## Included
 
@@ -12,7 +12,7 @@ Crestline Capital is a modern digital-banking application scaffold built with Ne
 - Convex mutations for dashboard reads, transfers and card state changes
 - Safe demo seed data (no real money movement)
 
-The source documentation calls for identity/KYC/AML, a core double-entry ledger, fraud detection, card/notification gateway, and the users/accounts/transactions/cards data model. Those are represented as the application architecture and Convex domain model; production integrations still require approved identity, banking, payment and compliance providers. fileciteturn0file0L49-L64 fileciteturn0file0L82-L103
+The source documentation calls for identity/KYC/AML, a core double-entry ledger, fraud detection, card/notification gateway, and the users/accounts/transactions/cards data model. Those are represented as the application architecture and Convex domain model; production integrations still require approved identity, banking, payment and compliance providers.
 
 ## Run locally
 
