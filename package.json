@@ -1,1 +1,8 @@
-{"name":"crestline-capital","version":"3.0.0","private":true,"scripts":{"dev":"next dev","build":"next build","start":"next start","lint":"next lint","typecheck":"tsc --noEmit","test":"bun test","convex:dev":"convex dev","convex:deploy":"convex deploy"},"dependencies":{"@auth/core":"0.41.1","@convex-dev/auth":"latest","convex":"^1.25.4","lucide-react":"^0.468.0","next":"^14.2.15","react":"^18.3.1","react-dom":"^18.3.1"},"devDependencies":{"@types/bun":"^1.2.0","@types/node":"^20.17.0","@types/react":"^18.3.12","@types/react-dom":"^18.3.1","eslint":"^8.57.1","eslint-config-next":"^14.2.15","typescript":"^5.6.3"}}
+{
+  "name":"crestline-capital",
+  "version":"3.0.0",
+  "private":true,
+  "scripts":{"dev":"next dev","build":"next build","start":"next start","lint":"next lint","typecheck":"tsc --noEmit","test":"bun test","convex:dev":"convex dev","convex:deploy":"convex deploy","db:migrate":"tsx scripts/migrate-neon.ts"},
+  "dependencies":{"@auth/core":"0.41.1","@convex-dev/auth":"latest","@neondatabase/serverless":"^1.0.2","convex":"^1.25.4","lucide-react":"^0.468.0","next":"^14.2.15","react":"^18.3.1","react-dom":"^18.3.1"},
+  "devDependencies":{"@types/bun":"^1.2.0","@types/node":"^20.17.0","@types/react":"^18.3.12","@types/react-dom":"^18.3.1","eslint":"^8.57.0","eslint-config-next":"^14.2.15","tsx":"^4.19.2","typescript":"^5.6.3"}
+}
