@@ -1,4 +1,5 @@
 import { defineSchema, defineTable } from "convex/server";
+import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
 const role = v.union(v.literal("customer"), v.literal("support"), v.literal("operator"), v.literal("compliance"), v.literal("admin"));
@@ -6,7 +7,23 @@ const accountStatus = v.union(v.literal("active"), v.literal("frozen"), v.litera
 const transferStatus = v.union(v.literal("initiated"), v.literal("review"), v.literal("processing"), v.literal("completed"), v.literal("failed"), v.literal("cancelled"));
 
 export default defineSchema({
-  users: defineTable({ authSubject: v.string(), email: v.string(), name: v.string(), role, kycStatus: v.union(v.literal("not_started"), v.literal("pending"), v.literal("manual_review"), v.literal("verified"), v.literal("rejected")), accountStatus: v.union(v.literal("active"), v.literal("restricted"), v.literal("closed")), twoFactorEnabled: v.boolean(), createdAt: v.number(), updatedAt: v.number() }).index("by_auth_subject", ["authSubject"]).index("by_email", ["email"]).index("by_role", ["role"]),
+  ...authTables,
+  users: defineTable({
+    name: v.optional(v.string()),
+    image: v.optional(v.string()),
+    email: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    phone: v.optional(v.string()),
+    phoneVerificationTime: v.optional(v.number()),
+    isAnonymous: v.optional(v.boolean()),
+    authSubject: v.optional(v.string()),
+    role,
+    kycStatus: v.union(v.literal("not_started"), v.literal("pending"), v.literal("manual_review"), v.literal("verified"), v.literal("rejected")),
+    accountStatus: v.union(v.literal("active"), v.literal("restricted"), v.literal("closed")),
+    twoFactorEnabled: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_auth_subject", ["authSubject"]).index("by_email", ["email"]).index("by_role", ["role"]),
   accounts: defineTable({ userId: v.id("users"), type: v.union(v.literal("checking"), v.literal("savings"), v.literal("business")), balance: v.number(), availableBalance: v.number(), currency: v.string(), accountNumber: v.string(), accountNumberMasked: v.string(), status: accountStatus, createdAt: v.number(), updatedAt: v.number() }).index("by_user", ["userId"]).index("by_number", ["accountNumber"]).index("by_status", ["status"]),
   transactions: defineTable({ accountId: v.id("accounts"), userId: v.id("users"), amount: v.number(), currency: v.string(), category: v.string(), type: v.union(v.literal("debit"), v.literal("credit")), status: v.union(v.literal("pending"), v.literal("completed"), v.literal("failed"), v.literal("reversed")), description: v.string(), reference: v.string(), createdAt: v.number(), updatedAt: v.number() }).index("by_account", ["accountId", "createdAt"]).index("by_user", ["userId", "createdAt"]).index("by_reference", ["reference"]),
   ledgerEntries: defineTable({ transactionId: v.id("transactions"), accountId: v.id("accounts"), direction: v.union(v.literal("debit"), v.literal("credit")), amount: v.number(), currency: v.string(), createdAt: v.number() }).index("by_transaction", ["transactionId"]).index("by_account", ["accountId", "createdAt"]),
