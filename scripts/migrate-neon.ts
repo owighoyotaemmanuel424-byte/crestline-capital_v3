@@ -1,4 +1,3 @@
-import "server-only";
 import { neon } from "@neondatabase/serverless";
 import { readdir, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -19,11 +18,6 @@ await sql`
 const files = (await readdir(migrationsDir))
   .filter((file) => /^\d+_.+\.sql$/.test(file))
   .sort();
-
-if (files.length === 0) {
-  console.log("No Neon migrations found.");
-  process.exit(0);
-}
 
 for (const file of files) {
   const version = file.split("_")[0];
