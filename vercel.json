@@ -1,5 +1,5 @@
 {
-  "buildCommand": "bun x convex deploy --cmd 'bun run build'",
+  "buildCommand": "bun run build",
   "framework": "nextjs",
   "installCommand": "bun install --no-frozen-lockfile",
   "outputDirectory": ".next"
