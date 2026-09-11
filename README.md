@@ -29,7 +29,7 @@ Required production configuration is documented in `.env.example`. Secrets must 
 ## Development
 
 ```bash
-bun install
+bun install --no-frozen-lockfile
 bun x convex dev
 bun run dev
 ```
@@ -39,14 +39,14 @@ bun run dev
 ## Validation
 
 ```bash
-bun install --frozen-lockfile
+bun install --no-frozen-lockfile
 bun run typecheck
 bun run lint
 bun test
 bun run build
 ```
 
-GitHub Actions runs the same validation sequence without requiring access to a production Convex deployment.
+CI uses the same validation sequence with read-only repository permissions. The workflow intentionally does not mutate or commit lockfiles during a build.
 
 ## Deployment
 
